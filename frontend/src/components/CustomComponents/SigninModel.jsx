@@ -46,7 +46,7 @@ const SigninModel = ({ setIsPageLoading ,isOpen, onClose }) => {
         setLoading(true);
         try {
             const url = isRegister ? `${window.location.origin}/api/user/register` : `${import.meta.env.VITE_API_BASE_URL}/api/user/signin`; // Adjust API routes
-            const response = await axios.post(url, formData, { withCredentials: true } );
+            const response = await axios.post(url, formData );
             if (response.status == 200) {
                 setUser(response.data);
                 setIsPageLoading(true)
