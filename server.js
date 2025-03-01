@@ -14,12 +14,14 @@ const server = http.createServer(app)
 const PORT = process.env.PORT || 5000;
 const __dirname = path.resolve();
 
-app.use(cors({
-    origin: "https://pixel-bot-prod.vercel.app", // Frontend URL
-    credentials: true, // Allow sending cookies
-    methods: ["GET", "POST", "PUT", "DELETE"], // Allow specific HTTP methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Allow headers
-}));
+// app.use(cors({
+//     origin: "*", // Frontend URL
+//     credentials: true, // Allow sending cookies
+//     methods: ["GET", "POST", "PUT", "DELETE"], // Allow specific HTTP methods
+//     allowedHeaders: ["Content-Type", "Authorization"], // Allow headers
+// }));
+
+app.use(cors())
 
 app.use(express.json({limit:"50mb"})); //To parse JSON data in the req.body
 app.use(express.urlencoded({extended: true})) //To parse from data in the req.body
