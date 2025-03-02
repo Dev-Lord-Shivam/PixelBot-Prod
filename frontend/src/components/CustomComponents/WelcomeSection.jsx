@@ -11,7 +11,7 @@ const WelcomeSection = () => {
     const {isContactOpen, setContactOpen} = useContactModal();
     return (
         <Box>
-            <HStack spacing={8} align="center" justify="space-between">
+            <HStack spacing={8} align="center" justify="space-between" flexDir={{base: 'column', md: 'row'}}>
                 <VStack align="flex-start" spacing={4} maxW="lg">
                     <Text fontSize="4xl" fontWeight="bold">
                         Hello, <Text as="span" color="purple.600">{user.name} 👋</Text> welcome to{' '}

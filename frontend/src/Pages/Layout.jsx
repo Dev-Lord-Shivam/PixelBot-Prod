@@ -7,7 +7,8 @@ import {
   Text,
   VStack,
   Link,
-  Image
+  Image,
+  useBreakpointValue
 } from "@chakra-ui/react";
 import { MenuContent, MenuItem, MenuRoot, MenuTrigger, Button } from "@chakra-ui/react";
 import { FaBars, FaRegUser, FaAngleDoubleLeft, FaRobot } from "react-icons/fa";
@@ -36,7 +37,7 @@ export default function Layout({ children }) {
   const userinfo = useRecoilValue(userAtom);
   const showToast = useShowToast();
   const setUser = useSetRecoilState(userAtom);
-
+  const isMobile = useBreakpointValue({ base: true, md: false });
   useEffect(() => {
     setTimeout(() => setIsPageLoading(false), 2000)
   })
@@ -52,7 +53,7 @@ export default function Layout({ children }) {
   const logOutUser = async () => {
     setIsPageLoading(true)
     try {
-      const res = await axios.get(`${window.location.origin}/api/user/logout`);
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/user/logout`);
       if (res.status == 200) {
         Cookies.remove("pixelpen-user");
 
@@ -79,52 +80,54 @@ export default function Layout({ children }) {
     <>
       <Flex h="100vh">
         {/* Sidebar */}
-        <Box
-          w={isCollapsed ? "50px" : "220px"}
-          bg={{ base: "white", _dark: 'gray.900' }}
-          //color="white"
-          h="100vh"
-          borderRight="1px solid"
-          borderColor="gray.200"
-          transition="width 0.3s ease"
-          position="fixed"
-          top={0}
-          left={0}
-          zIndex={10}
-        >
-          {/* Sidebar Header */}
-          <Flex justify={isCollapsed ? "center" : "space-between"} align="center" p={2}>
-            {!isCollapsed && <Image src={bot} alt="Bot Animation" width="50px" height="50px" />}
-            <IconButton
-              aria-label="Toggle Sidebar"
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              variant="ghost"
-              color={{ base: "black", _dark: 'white' }}
-            >
-              {isCollapsed ? <FaBars /> : <FaAngleDoubleLeft />}
-            </IconButton>
-          </Flex>
+        {!isMobile && (
+          <Box
+            w={isCollapsed ? "50px" : "220px"}
+            bg={{ base: "white", _dark: 'gray.900' }}
+            //color="white"
+            h="100vh"
+            borderRight="1px solid"
+            borderColor="gray.200"
+            transition="width 0.3s ease"
+            position="fixed"
+            top={0}
+            left={0}
+            zIndex={10}
 
-          {/* Sidebar Navigation */}
-          <VStack align="stretch" spacing={2} p={4}>
-            {menuData.map((item, index) => (
-              <Link key={index} display="flex" alignItems="center" py={2} onClick={() => handleNavigation(`${item.path}/${item.id}`)}>
-                {item.sideBarIcon}
-                {!isCollapsed && <Text fontWeight="bold" fontSize="sm" ml={2}>{item.menuname}</Text>}
-              </Link>
-            ))}
-          </VStack>
-        </Box>
+          >
+            {/* Sidebar Header */}
+            <Flex justify={isCollapsed ? "center" : "space-between"} align="center" p={2}>
+              {!isCollapsed && <Image src={bot} alt="Bot Animation" width="50px" height="50px" />}
+              <IconButton
+                aria-label="Toggle Sidebar"
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                variant="ghost"
+                color={{ base: "black", _dark: 'white' }}
+              >
+                {isCollapsed ? <FaBars /> : <FaAngleDoubleLeft />}
+              </IconButton>
+            </Flex>
 
+            {/* Sidebar Navigation */}
+            <VStack align="stretch" spacing={2} p={4}>
+              {menuData.map((item, index) => (
+                <Link key={index} display="flex" alignItems="center" py={2} onClick={() => handleNavigation(`${item.path}/${item.id}`)}>
+                  {item.sideBarIcon}
+                  {!isCollapsed && <Text fontWeight="bold" fontSize="sm" ml={2}>{item.menuname}</Text>}
+                </Link>
+              ))}
+            </VStack>
+          </Box>
+        )}
         {/* Main Content Area */}
-        <Box flex="1" ml={isCollapsed ? "50px" : "220px"} h="100vh" display="flex" flexDirection="column">
+        <Box flex="1" ml={!isMobile ? (isCollapsed ? "50px" : "220px") : "0"} h="100vh" display="flex" flexDirection="column">
           {/* Navbar */}
           <Box
             borderBottom="1px solid"
             borderColor="gray.200"
             position="fixed"
             top={0}
-            left={isCollapsed ? "50px" : "220px"}
+            left={!isMobile ? (isCollapsed ? "50px" : "220px") : "0"}
             right={0}
             zIndex={9}
             bg={{ base: "white", _dark: 'gray.900' }}
@@ -204,6 +207,15 @@ export default function Layout({ children }) {
                 </Box>
               </Flex>
             </Flex>
+            {isMobile &&
+              <Flex w={'full'} gap={10} borderTop={'2px solid'} borderColor="gray.200">
+                {menuData.map((item, index) => (
+                  <Link key={index} display="flex" alignItems="center" py={2} onClick={() => handleNavigation(`${item.path}/${item.id}`)}>
+                    {item.sideBarIcon}
+                  </Link>
+                ))}
+              </Flex>
+            }
           </Box>
 
           {/* Page Content - Scrollable */}
