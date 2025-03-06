@@ -53,7 +53,7 @@ export default function Layout({ children }) {
   const logOutUser = async () => {
     setIsPageLoading(true)
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/user/logout`);
+      const res = await axios.get(`${window.location.origin}/api/user/logout`);
       if (res.status == 200) {
         Cookies.remove("pixelpen-user");
 
