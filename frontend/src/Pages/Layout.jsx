@@ -68,7 +68,7 @@ export default function Layout({ children }) {
       }
     } catch (error) {
       showToast(
-        "something is wrong",
+        error.message || "something is wrong",
         "error"
       );
     }

@@ -48,7 +48,13 @@ const ContentPage = () => {
         }
     }
 
-    const sendPromptToGemini = async () => {
+    const sendPromptToGemini = async (e) => {
+        e.preventDefault();
+        const missingFields = tool.form.filter(field => field.required && !formData[field.name]);
+        if (missingFields.length > 0) {
+            showToast("Please fill all required fields", "error");
+            return;
+        }
         try {
             setIsLoading(true);
             const prompt = tool?.aiPrompt
@@ -106,74 +112,76 @@ const ContentPage = () => {
     };
 
     return (
-        <Container maxW="full" p={6} bg={{base:"gray.100", _dark:"gray.800"}}>
-            <Flex w="full" gap={6} align="start" flexDir={{base: 'column', md: 'row'}}>
+        <Container maxW="full" p={6} bg={{ base: "gray.100", _dark: "gray.800" }}>
+            <Flex w="full" gap={6} align="start" flexDir={{ base: 'column', md: 'row' }}>
                 {/* Left User Input Section */}
-                <Box bg={{base:"white", _dark:"gray.700"}} w={{base: "100%", md:"30%"}} p={6} borderRadius="lg" boxShadow="md">
+                <Box bg={{ base: "white", _dark: "gray.700" }} w={{ base: "100%", md: "30%" }} p={6} borderRadius="lg" boxShadow="md">
                     <Flex direction="column" align="center" gap={2}>
                         <Image boxSize="80px" src={tool.icon} alt={tool.name} />
-                        <Heading as="h1" fontWeight="bold" size="lg" color={{base:"blue.700", _dark:"white"}}>{tool.name}</Heading>
-                        <Heading as="p" size="sm" fontWeight="medium" color={{base:"gray.600", _dark:"white"}} textAlign="center">
+                        <Heading as="h1" fontWeight="bold" size="lg" color={{ base: "blue.700", _dark: "white" }}>{tool.name}</Heading>
+                        <Heading as="p" size="sm" fontWeight="medium" color={{ base: "gray.600", _dark: "white" }} textAlign="center">
                             {tool.desc}
                         </Heading>
                     </Flex>
-
-                    <Box mt={2}>
-                        {tool.form.map((field, index) => (
-                            <Box key={index} mt={4}>
-                                <Heading as="label" size="sm" fontWeight="bold" color={{base:"gray.700",_dark:'white'}}>
-                                    {field.label}
-                                </Heading>
-                                {field.field === "input" ? (
-                                    <Input
-                                        name={field.name}
-                                        onChange={handleChange}
-                                        isRequired={field.required}
-                                        border="2px solid" 
-                                        borderColor="gray.400"
-                                        placeholder={field.placeholder}
-                                        mt={2}
-                                    />
-                                ) : (
-                                    <Textarea
-                                        name={field.name}
-                                        onChange={handleChange}
-                                        isRequired={field.required}
-                                        h="120px" border="2px solid" borderColor="gray.400"
-                                        mt={2}
-                                       // _placeholder={field.length > 1 && field[1].placeholder ? field[1].placeholder : field[0].placeholder}
-                                       placeholder={field.placeholder}
-                                    />
-                                )}
-                            </Box>
-                        ))}
-                        <Button
-                            onClick={() => sendPromptToGemini()}
-                            mt={4} 
-                            bg={{base:"blue.500",_dark:'white'}}
-                            width="full"
-                            loading={isloading}
-                            disabled={isloading}
-                            loadingText={'Thinking..'}
-                        >
-                            Generate
-                        </Button>
-                    </Box>
+                    <form>
+                        <Box mt={2}>
+                            {tool.form.map((field, index) => (
+                                <Box key={index} mt={4}>
+                                    <Heading as="label" size="sm" fontWeight="bold" color={{ base: "gray.700", _dark: 'white' }}>
+                                        {field.label}
+                                    </Heading>
+                                    {field.field === "input" ? (
+                                        <Input
+                                            name={field.name}
+                                            onChange={handleChange}
+                                            isRequired={field.required}
+                                            border="2px solid"
+                                            borderColor="gray.400"
+                                            placeholder={field.placeholder}
+                                            mt={2}
+                                        />
+                                    ) : (
+                                        <Textarea
+                                            name={field.name}
+                                            onChange={handleChange}
+                                            isRequired={field.required}
+                                            h="120px" border="2px solid" borderColor="gray.400"
+                                            mt={2}
+                                            // _placeholder={field.length > 1 && field[1].placeholder ? field[1].placeholder : field[0].placeholder}
+                                            placeholder={field.placeholder}
+                                        />
+                                    )}
+                                </Box>
+                            ))}
+                            <Button
+                                type="submit"
+                                onClick={sendPromptToGemini}
+                                mt={4}
+                                bg={{ base: "blue.500", _dark: 'white' }}
+                                width="full"
+                                loading={isloading}
+                                disabled={isloading}
+                                loadingText={'Thinking..'}
+                            >
+                                Generate
+                            </Button>
+                        </Box>
+                    </form>
                 </Box>
 
                 {/* Right Output Section */}
-                <Box w={{base: "100%", md:"70%"}} bg={{base:"white",_dark:'gray.700'}} p={4} borderRadius="lg" boxShadow="md">
+                <Box w={{ base: "100%", md: "70%" }} bg={{ base: "white", _dark: 'gray.700' }} p={4} borderRadius="lg" boxShadow="md">
                     <Flex justify={"space-between"} align={"center"} p={2}>
                         <Text fontWeight={"bold"}>Your Result</Text>
                         <Box display={"flex"} gap={4}>
                             {isSyncing &&
                                 <HStack>
-                                    <Text fontWeight={"bold"} color={{base:"purple.500",_dark:'white'}}>Syncing</Text>
-                                    <Spinner size="sm" color={{base:"purple.500",_dark:'white'}}
+                                    <Text fontWeight={"bold"} color={{ base: "purple.500", _dark: 'white' }}>Syncing</Text>
+                                    <Spinner size="sm" color={{ base: "purple.500", _dark: 'white' }}
                                         css={{ "--spinner-track-color": "colors.gray.200" }} />
                                 </HStack>
                             }
-                            <Button size={'xs'} bg={{base:"purple.600",_dark:'white'}} onClick={copyToClipboard}>
+                            <Button size={'xs'} bg={{ base: "purple.600", _dark: 'white' }} onClick={copyToClipboard}>
                                 {copied ? <FaCheck /> : <FaRegCopy />}
                                 {copied ? '' : 'copy'}
                             </Button>
